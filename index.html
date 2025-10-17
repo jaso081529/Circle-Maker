@@ -1,0 +1,240 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Circle Logo Maker — HP67 v3.2</title>
+  <meta name="theme-color" content="#111827">
+  <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+  <header>
+    <h1>Circle Logo Maker v3.2</h1>
+    <div class="header-actions">
+      <label class="preset-select">
+        Preset:
+        <select id="presetSelect">
+          <option value="">— auswählen —</option>
+          <option value="presetA">Brustlogo (ohne Ring)</option>
+          <option value="presetB">Siegel (Außenring)</option>
+        </select>
+      </label>
+      <button id="savePreset" class="ghost">Preset speichern</button>
+      <button id="saveProject" class="ghost">Projekt speichern</button>
+      <input id="loadProjectFile" type="file" accept=".json" hidden>
+      <button id="loadProject" class="ghost">Projekt laden</button>
+      <button id="forceRender" class="ghost">Aktualisieren</button>
+      <span id="renderDot" title="Render-Status"></span>
+    </div>
+  </header>
+
+  <main>
+    <section class="canvas-panel">
+      <div class="stage-wrap">
+        <svg id="stage" width="900" height="900" viewBox="0 0 1000 1000"
+             xmlns="http://www.w3.org/2000/svg"
+             xmlns:xlink="http://www.w3.org/1999/xlink">
+          <defs>
+            <pattern id="checker" width="20" height="20" patternUnits="userSpaceOnUse">
+              <rect width="10" height="10" fill="#f3f4f6"/>
+              <rect x="10" y="0" width="10" height="10" fill="#e5e7eb"/>
+              <rect x="0" y="10" width="10" height="10" fill="#e5e7eb"/>
+              <rect x="10" y="10" width="10" height="10" fill="#f3f4f6"/>
+            </pattern>
+          </defs>
+          <rect id="bgChecker" x="0" y="0" width="100%" height="100%" fill="url(#checker)"/>
+          <g id="exportRoot" transform="translate(500,500)">
+            <circle id="ringOuter" r="450" fill="none" stroke="#111827" stroke-width="40" />
+            <circle id="ringInner" r="370" fill="none" stroke="#111827" stroke-width="2" opacity="0.4"/>
+            <circle id="ringCore"  r="220" fill="none" stroke="#111827" stroke-width="2" opacity="0.2"/>
+            <defs id="pathsDef"></defs>
+            <g id="texts"></g>
+            <image id="centerImage" x="-150" y="-150" width="300" height="300" href="" visibility="hidden" preserveAspectRatio="xMidYMid slice"/>
+            <circle id="centerPlaceholder" r="4" fill="#9ca3af"/>
+          </g>
+          <image id="qrOverlay" x="840" y="840" width="140" height="140" href="" visibility="hidden"/>
+        </svg>
+      </div>
+      <div class="actions">
+        <button id="exportSvg">SVG (vektor)</button>
+        <button id="exportPng">PNG (transparent)</button>
+        <button id="exportPngFlat" class="ghost">PNG mit Hintergrund</button>
+        <button id="resetBtn" class="ghost">Zurücksetzen</button>
+      </div>
+    </section>
+
+    <section class="controls-panel">
+      <div class="grid two">
+        <div class="card">
+          <h2>Texte</h2>
+          <label>Text 1 (oben)
+            <input id="text1" placeholder="z. B. HOOD PLAKA" value="HOOD PLAKA">
+          </label>
+          <label>Text 2 (unten)
+            <input id="text2" placeholder="z. B. KAISERSLAUTERN" value="KAISERSLAUTERN">
+          </label>
+          <label>Text 3 (optional)
+            <input id="text3" placeholder="z. B. EDITION 67">
+          </label>
+
+          <div class="grid two tight">
+            <label>Radius T1 <input id="r1" type="range" min="200" max="450" value="398"></label>
+            <label>Radius T2 <input id="r2" type="range" min="200" max="450" value="398"></label>
+            <label>Radius T3 <input id="r3" type="range" min="140" max="450" value="300"></label>
+            <label>Winkel Start <input id="startAngle" type="range" min="-180" max="180" value="0"></label>
+          </div>
+
+          <div class="grid two tight">
+            <label>Richtung oben
+              <select id="dir1">
+                <option value="cw" selected>Uhrzeiger</option>
+                <option value="ccw">Gegen Uhrzeiger</option>
+              </select>
+            </label>
+            <label>Richtung unten
+              <select id="dir2">
+                <option value="ccw" selected>Gegen Uhrzeiger</option>
+                <option value="cw">Uhrzeiger</option>
+              </select>
+            </label>
+          </div>
+
+          <label>Bogenspannung (°) <input id="sweep" type="range" min="90" max="360" value="320"></label>
+
+          <div class="grid two tight">
+            <label>Schriftgröße <input id="fontSize" type="range" min="20" max="180" value="92"></label>
+            <label>Zeichenabstand <input id="letterSpace" type="range" min="-50" max="300" value="10"></label>
+          </div>
+
+          <div class="grid two tight">
+            <label>Schriftfamilie
+              <select id="fontFamily">
+                <option>Inter, system-ui, -apple-system, Segoe UI, Roboto</option>
+                <option>Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif</option>
+                <option>'Trebuchet MS', Tahoma, sans-serif</option>
+                <option>Georgia, 'Times New Roman', serif</option>
+                <option>monospace</option>
+              </select>
+            </label>
+            <label>Schriftstärke
+              <select id="fontWeight">
+                <option>400</option>
+                <option selected>700</option>
+                <option>800</option>
+                <option>900</option>
+              </select>
+            </label>
+          </div>
+
+          <div class="grid two tight">
+            <label>Füllfarbe <input id="fillColor" type="color" value="#111827"></label>
+            <label>Konturfarbe <input id="strokeColor" type="color" value="#111827"></label>
+          </div>
+          <div class="grid two tight">
+            <label>Konturbreite <input id="strokeWidth" type="range" min="0" max="20" value="0"></label>
+            <label>Zentrierung Text <input id="offset" type="range" min="-180" max="180" value="0"></label>
+          </div>
+
+          <div class="grid two tight">
+            <label>Eigene Schrift (TTF/OTF/WOFF/WOFF2)
+              <input id="fontFile" type="file" accept=".ttf,.otf,.woff,.woff2">
+            </label>
+            <button id="loadFontBtn" class="ghost">Schrift laden</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Ringe & Mitte</h2>
+          <div class="grid two tight">
+            <label>Außenring Breite <input id="outerW" type="range" min="0" max="100" value="40"></label>
+            <label>Außenring Farbe <input id="outerC" type="color" value="#111827"></label>
+            <label>Innenring Radius <input id="innerR" type="range" min="150" max="480" value="370"></label>
+            <label>Innenring Deckung <input id="innerO" type="range" min="0" max="100" value="40"></label>
+            <label>Kernring Radius <input id="coreR" type="range" min="100" max="480" value="220"></label>
+            <label>Kernring Deckung <input id="coreO" type="range" min="0" max="100" value="20"></label>
+          </div>
+
+          <div class="grid two tight">
+            <label>Center Icon (PNG/SVG)
+              <input id="centerFile" type="file" accept=".png,.svg,.jpg,.jpeg">
+            </label>
+            <label>Größe Mitte <input id="centerSize" type="range" min="50" max="700" value="300"></label>
+          </div>
+          <div class="grid two tight">
+            <label>QR (unten rechts, optional)
+              <input id="qrFile" type="file" accept=".png,.svg,.jpg,.jpeg">
+            </label>
+            <label>QR Größe <input id="qrSize" type="range" min="60" max="300" value="140"></label>
+          </div>
+          <label class="checkbox"><input id="hideBg" type="checkbox" checked> Schachbrett-Hintergrund in Vorschau ausblenden (Transparenz)</label>
+        </div>
+
+        <div class="card">
+          <h2>Export & Druck</h2>
+          <div class="grid two tight">
+            <label>Modus (Farb-Setup)
+              <select id="printMode">
+                <option value="textile">Textil (DTF/DTV/HTV) – sRGB safe</option>
+                <option value="sticker">Sticker (Inkjet Vinyl) – sRGB vivid</option>
+              </select>
+            </label>
+            <label>Hintergrundfarbe (für PNG Flat)
+              <input id="bgColor" type="color" value="#ffffff">
+            </label>
+          </div>
+
+          <div class="grid two tight">
+            <label>Vorlage
+              <select id="artboard">
+                <option value="custom">Custom Quadrat</option>
+                <option value="A4_300">A4 (300 DPI)</option>
+                <option value="A4_600">A4 (600 DPI)</option>
+                <option value="A3_300">A3 (300 DPI)</option>
+                <option value="A3_600">A3 (600 DPI)</option>
+              </select>
+            </label>
+            <label>DPI
+              <input id="dpi" type="number" min="72" max="1200" step="1" value="300">
+            </label>
+          </div>
+
+          <div class="grid two tight">
+            <label>Kantenlänge (px) <input id="pxSize" type="number" min="500" max="16000" step="10" value="4000"></label>
+            <label>MM Kantenlänge <input id="mmSize" type="number" min="10" max="1200" step="1" value="340"></label>
+          </div>
+
+          <div class="grid two tight">
+            <label>Gamma <input id="gamma" type="range" min="0.5" max="2.5" step="0.01" value="2.2"></label>
+            <label>Sättigung <input id="saturation" type="range" min="0" max="2" step="0.01" value="1.00"></label>
+          </div>
+
+          <div class="grid two tight">
+            <label>Kontrast <input id="contrast" type="range" min="0.5" max="2.0" step="0.01" value="1.00"></label>
+            <label>Helligkeit <input id="brightness" type="range" min="0.5" max="1.5" step="0.01" value="1.00"></label>
+          </div>
+
+          <small class="muted">Hinweis: PNG-Export in **sRGB** mit **DPI-Tag**. Für echte ICC-Zuweisung nimm **SVG** in dein RIP/Driver und wähle das Medien‑ICC.</small>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>© 2025 HP67 • sRGB-Exports mit DPI-Tag • Projekt-Save/Load • Font-Upload</div>
+    <div><a href="#" id="howTo">Kurzanleitung</a></div>
+  </footer>
+
+  <dialog id="helpDlg">
+    <h3>Kurzanleitung</h3>
+    <ol>
+      <li>Preset wählen (oder manuell einstellen).</li>
+      <li>Modus wählen: Textil oder Sticker.</li>
+      <li>Größe & DPI festlegen.</li>
+      <li>Export: SVG/PNG.</li>
+    </ol>
+    <button id="closeHelp">Schließen</button>
+  </dialog>
+
+  <script src="js/app.js"></script>
+</body>
+</html>
